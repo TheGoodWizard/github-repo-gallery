@@ -6,6 +6,8 @@ const jumbotron = document.querySelector(".overview");
 
 const username = "TheGoodWizard";
 
+const repoList = document.querySelector(".repo-list");
+
 // *****=====----- ASYNC FUNCTION TO FETCH GITHUB USER DATA -----=====***** //
 
  const getUsernameData = async function () {
@@ -34,4 +36,27 @@ const username = "TheGoodWizard";
     </div>
   `;
     jumbotron.append(div);
+    getRepoList();
  };
+
+ 
+ // *****=====----- ASYNC FUNCTION RESPONSIBLE FOR FETCHING MY REPOS -----=====***** //
+
+ const getRepoList = async function () {
+     const showRepoList = await fetch(`https://api.github.com/users/${username}/repos?sort=updated&per_page=100`);
+     const repoData = await showRepoList.json();
+     displayRepoData(repoData);
+ };
+
+ // *****=====----- FUNCTION RESPONSIBLE FOR DISPLAYING REPO INFORMAtION -----=====***** //
+
+ const displayRepoData = function (repos) {
+    for (const repo of repos) {
+        const repoItem = document.createElement("li");
+        repoItem.classList.add("repo");
+        repoItem.innerHTML = `<h3>${repo.name}</h3>`;
+        repoList.append(repoItem);
+    }
+ };
+
+ 
