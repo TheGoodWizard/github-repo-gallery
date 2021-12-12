@@ -8,6 +8,10 @@ const username = "TheGoodWizard";
 
 const repoList = document.querySelector(".repo-list");
 
+const sectionRepoInfo = document.querySelector(".repos");
+
+const sectionRepoData = document.querySelector(".repo-data");
+
 // *****=====----- ASYNC FUNCTION TO FETCH GITHUB USER DATA -----=====***** //
 
  const getUsernameData = async function () {
@@ -44,8 +48,8 @@ const repoList = document.querySelector(".repo-list");
 
  const getRepoList = async function () {
      const showRepoList = await fetch(`https://api.github.com/users/${username}/repos?sort=updated&per_page=100`);
-     const repoData = await showRepoList.json();
-     displayRepoData(repoData);
+     const sectionRepoData = await showRepoList.json();
+     displayRepoData(sectionRepoData);
  };
 
  // *****=====----- FUNCTION RESPONSIBLE FOR DISPLAYING REPO INFORMAtION -----=====***** //
@@ -58,5 +62,54 @@ const repoList = document.querySelector(".repo-list");
         repoList.append(repoItem);
     }
  };
+
+ // *****=====----- UNORDERED LIST, CLICK EVENT LISTENER -----=====***** //
+
+ repoList.addEventListener("click", function (e) {
+     if (e.target.matches("h3")) {
+         const repoName = e.target.innerText;
+         getSpecificRepoInfo(repoName);
+     }
+ });
+
+ 
+ // *****=====----- ASYNC FUNCTION RESPONSBILE FOR FETCHING REPO INFO ON INDIVIDUAL REPOS -----=====***** //
+
+ const getSpecificRepoInfo = async function (repoName) {
+    const specificRepoInfo = await fetch(`https://api.github.com/repos/${username}/${repoName}`);
+    const repoInfo = await specificRepoInfo.json();
+    // *****=====----- FETCH LANGUAGE DATA -----=====***** //
+    const fetchLanguages = await fetch(repoInfo.languages_url);
+    const languageData = await fetchLanguages.json();
+    console.log(repoInfo);
+
+    // *****=====----- LIST OF LANGUAGES -----=====***** //
+
+    const languages = [];
+    for (const language in languageData) {
+        languages.push(language);
+    }
+
+    displayRepoInfo(repoInfo, languages);
+
+    };
+    
+    displayRepoInfo = function (repoInfo, languages) {
+        sectionRepoData.innerHTML = "";
+        sectionRepoData.classList.remove("hide");
+        sectionRepoInfo.classList.add("hide");
+        const div = document.createElement("div");
+        div.innerHTML = `
+          <h3>Name: ${repoInfo.name}</h3>
+          <p>Description: ${repoInfo.description}</p>
+          <p>Default Branch: ${repoInfo.default_branch}</p>
+          <p>Languages: ${languages.join(", ")}</p>
+          <a class="visit" href="${repoInfo.html_url}" target="_blank" rel="noreferrer noopener">View Repo on GitHub!</a>
+        `;
+        sectionRepoData.append(div);
+    };
+ 
+
+ 
 
  
